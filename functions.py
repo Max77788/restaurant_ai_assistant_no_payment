@@ -51,10 +51,10 @@ def post_order(items):
     # Checking if the request was successful
     if response.status_code == 200:
         print('Order posted successfully.')
-        return jsonify({"response":"success"})
+        return "success"
     else:
         print('Failed to post order. Status code:', response.status_code)
-        return jsonify({"response":"Was not able to post the order"})
+        return "Was not able to post the order"
 
 
 def create_assistant(client):

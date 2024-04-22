@@ -186,37 +186,25 @@ def chat():
                     else:
                         items = [{"name":"Order\'s items were not retrieved", "quantity":"Ask the customer directly, or take a look at the tablet\'s screen"}]
                         output = functions.post_order(items)
-                    print(f"Output Status Code: {output.status_code}")
-                    print(f"Output Headers: {output.headers}")
-                    #if output.text:
-                        #print(f"Output Body: {output.text}")  # Use .text if the response body is text, .json() if it's JSON
-                    #elif output.json():
-                        #print(f"Output Body: {output.json()}")
+                    # Convert the output to a serializable format if not already
                     
-                    break
+                    print(f"\nOutput Taken:\n{output}\n")
+                    
+                    client.beta.threads.runs.submit_tool_outputs(thread_id=thread_id,
+                                                                run_id=run.id,
+                                                                tool_outputs=[{
+                                                                    "tool_call_id":
+                                                                    tool_call.id,
+                                                                    "output":
+                                                                    json.dumps(output)
+                                                                }])
+                    
+                    print(f"\nOutput Submitted!\n")
+                    should_break = True
+                    break  # This breaks the for loop, not the while loop
+            if should_break:
+                break  # This will break the while loop if the flag is set
                 
-                '''
-                # Convert the output to a serializable format if not already
-                if isinstance(output, Response):
-                # Convert your Response object into a serializable dictionary
-                        # This is just an example; you'll need to adapt it based on the actual structure of `output`
-                    output_dict = {
-                                'status_code': output.status_code,
-                                'data': output.json()  # Assuming the response is in JSON format
-                    }
-                else:
-                        # If it's already a dictionary or a serializable object, use as is
-                    output_dict = output
-                
-                client.beta.threads.runs.submit_tool_outputs(thread_id=thread_id,
-                                                            run_id=run.id,
-                                                            tool_outputs=[{
-                                                                "tool_call_id":
-                                                                tool_call.id,
-                                                                "output":
-                                                                json.dumps(output_dict)
-                                                            }])
-                '''
                 """
                 if tool_call.function.name == "post_order":
                 # Pizza order accepted
