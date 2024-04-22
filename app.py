@@ -188,10 +188,10 @@ def chat():
                         output = functions.post_order(items)
                     print(f"Output Status Code: {output.status_code}")
                     print(f"Output Headers: {output.headers}")
-                    if output.text:
-                        print(f"Output Body: {output.text}")  # Use .text if the response body is text, .json() if it's JSON
-                    elif output.json():
-                        print(f"Output Body: {output.json()}")
+                    #if output.text:
+                        #print(f"Output Body: {output.text}")  # Use .text if the response body is text, .json() if it's JSON
+                    #elif output.json():
+                        #print(f"Output Body: {output.json()}")
                     
                     break
                 
