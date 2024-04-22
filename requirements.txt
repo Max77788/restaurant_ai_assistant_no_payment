@@ -1,5 +1,5 @@
 Flask
-openai>=0.10.2
+openai==0.10.2
 requests
 python-dotenv
 gunicorn
