@@ -121,127 +121,138 @@ def error_payment():
 # Generate response
 @app.route('/chat', methods=['POST'])
 def chat():
-  data = request.json
-  thread_id = data.get('thread_id')
-  user_input = data.get('message', '')
+    data = request.json
+    thread_id = data.get('thread_id')
+    user_input = data.get('message', '')
 
-  if not thread_id:
-    print("Error: Missing thread_id")  # Debugging line
-    return jsonify({"error": "Missing thread_id"}), 400
+    if not thread_id:
+        print("Error: Missing thread_id")  # Debugging line
+        return jsonify({"error": "Missing thread_id"}), 400
 
-  print(f"Received message: {user_input} for thread ID: {thread_id}"
-        )  # Debugging line
+    print(f"Received message: {user_input} for thread ID: {thread_id}"
+            )  # Debugging line
 
-  # Add the user's message to the thread
-  response = client.beta.threads.messages.create(thread_id=thread_id,
-                                      role="user",
-                                      content=user_input)
-  
-  # Run the Assistant
-  run = client.beta.threads.runs.create(thread_id=thread_id,
-                                        assistant_id=assistant_id)
-  
-  # Check if the Run requires action (function call)
-  while True:
-    run_status = client.beta.threads.runs.retrieve(thread_id=thread_id,
-                                                   run_id=run.id)
-    run_steps = client.beta.threads.runs.steps.list(
-    thread_id=thread_id,
-    run_id=run.id)
+    # Add the user's message to the thread
+    response = client.beta.threads.messages.create(thread_id=thread_id,
+                                        role="user",
+                                        content=user_input)
     
-    print(f"Run status: {run_status.status}")
-    if run_status.status == 'completed':
-        break
-    if run_status.status == 'failed':
+    # Run the Assistant
+    run = client.beta.threads.runs.create(thread_id=thread_id,
+                                            assistant_id=assistant_id)
+    
+    # Check if the Run requires action (function call)
+    while True:
+        run_status = client.beta.threads.runs.retrieve(thread_id=thread_id,
+                                                    run_id=run.id)
+        run_steps = client.beta.threads.runs.steps.list(
+        thread_id=thread_id,
+        run_id=run.id)
         
-        print("Run failed.")
-        # Access the last_error attribute
-        last_error = run.last_error if "last_error" in run else None
-
-        # Print the last_error if it exists
-        if last_error:
-            print("Last Error:", last_error)
-        else:
-            print("No errors reported for this run.")
-        
-        
-        print(f"\n\n Run steps: \n{run_steps}\n")
-        print(f"\n\n Run object: \n{run}\n")
-        response = 'O-oh, little issues, type the other message now'
-        return jsonify({"response": response})
+        print(f"Run status: {run_status.status}")
+        if run_status.status == 'completed':
+            break
+        if run_status.status == 'failed':
             
-    sleep(1)  # Wait for a second before checking again
-    if run_status.status == "requires_action":
-      print("Action in progress...")
-      # Handle the function call
-      for tool_call in run_status.required_action.submit_tool_outputs.tool_calls:
-        if tool_call.function.name == "post_order":
-          # Pizza order accepted
-          arguments = json.loads(tool_call.function.arguments)
+            print("Run failed.")
+            # Access the last_error attribute
+            last_error = run.last_error if "last_error" in run else None
 
-          print("\n\n\n\nRetrieved arguments:\n", arguments, "\n\n\n\n") #debugging line
+            # Print the last_error if it exists
+            if last_error:
+                print("Last Error:", last_error)
+            else:
+                print("No errors reported for this run.")
+            
+            
+            print(f"\n\n Run steps: \n{run_steps}\n")
+            print(f"\n\n Run object: \n{run}\n")
+            response = 'O-oh, little issues, type the other message now'
+            return jsonify({"response": response})
+                
+        sleep(1)  # Wait for a second before checking again
+        if run_status.status == "requires_action":
+            print("Action in progress...")
+        # Handle the function call
+        for tool_call in run_status.required_action.submit_tool_outputs.tool_calls:
+            if tool_call.function.name == "post_order":
+            # Pizza order accepted
+                arguments = json.loads(tool_call.function.arguments)
 
-          output = functions.post_order(arguments["items"])
-          print(f"Output: \n\n{output}")
-          
-          '''
-          # Convert the output to a serializable format if not already
-          if isinstance(output, Response):
-           # Convert your Response object into a serializable dictionary
-                # This is just an example; you'll need to adapt it based on the actual structure of `output`
-            output_dict = {
-                        'status_code': output.status_code,
-                        'data': output.json()  # Assuming the response is in JSON format
-            }
-          else:
-                # If it's already a dictionary or a serializable object, use as is
-            output_dict = output
-          
-          client.beta.threads.runs.submit_tool_outputs(thread_id=thread_id,
-                                                       run_id=run.id,
-                                                       tool_outputs=[{
-                                                           "tool_call_id":
-                                                           tool_call.id,
-                                                           "output":
-                                                           json.dumps(output_dict)
-                                                       }])
-        '''
-        """
-        if tool_call.function.name == "post_order":
-          # Pizza order accepted
-          arguments = json.loads(tool_call.function.arguments)
-          
-          print("\n\n\n\nRetrieved arguments:\n", arguments, "\n\n\n\n") #debugging line
+                print("\n\n\n\nRetrieved arguments:\n", arguments, "\n\n\n\n") #debugging line
 
-          output = functions.post_order(arguments["items"])
-          client.beta.threads.runs.submit_tool_outputs(thread_id=thread_id,
-                                                       run_id=run.id,
-                                                       tool_outputs=[{
-                                                           "tool_call_id":
-                                                           tool_call.id,
-                                                           "output":
-                                                           json.dumps(output)
-                                                       }])
-          
-          if tool_call.function.name == "start_payment":
-          # Payment Started
-          arguments = json.loads(tool_call.function.arguments)
-          output = functions.start_payment(arguments["method"])
-          client.beta.threads.runs.submit_tool_outputs(thread_id=thread_id,
-                                                       run_id=run.id,
-                                                       tool_outputs=[{
-                                                           "tool_call_id":
-                                                           tool_call.id,
-                                                           "output":
-                                                           json.dumps(output)
-                                                       }])
-          """                                             
-  # Retrieve and return the latest message from the assistant
-  messages = client.beta.threads.messages.list(thread_id=thread_id)
-  response = messages.data[0].content[0].text.value     
+                if arguments:
+                    output = functions.post_order(arguments["items"])
+                else:
+                    items = [{"name":"Order\'s items were not retrieved", "quantity":"Ask the customer directly, or take a look at the tablet\'s screen"}]
+                    output = functions.post_order(items)
+                print(f"Output Status Code: {output.status_code}")
+                print(f"Output Headers: {output.headers}")
+                if output.text:
+                    print(f"Output Body: {output.text}")  # Use .text if the response body is text, .json() if it's JSON
+                elif output.json():
+                    print(f"Output Body: {output.json()}")
+                
+                break
+                
+                '''
+                # Convert the output to a serializable format if not already
+                if isinstance(output, Response):
+                # Convert your Response object into a serializable dictionary
+                        # This is just an example; you'll need to adapt it based on the actual structure of `output`
+                    output_dict = {
+                                'status_code': output.status_code,
+                                'data': output.json()  # Assuming the response is in JSON format
+                    }
+                else:
+                        # If it's already a dictionary or a serializable object, use as is
+                    output_dict = output
+                
+                client.beta.threads.runs.submit_tool_outputs(thread_id=thread_id,
+                                                            run_id=run.id,
+                                                            tool_outputs=[{
+                                                                "tool_call_id":
+                                                                tool_call.id,
+                                                                "output":
+                                                                json.dumps(output_dict)
+                                                            }])
+                '''
+                """
+                if tool_call.function.name == "post_order":
+                # Pizza order accepted
+                arguments = json.loads(tool_call.function.arguments)
+                
+                print("\n\n\n\nRetrieved arguments:\n", arguments, "\n\n\n\n") #debugging line
 
-  print(f"Assistant response: {response}")  # Debugging line
-  return jsonify({"response": response})
+                output = functions.post_order(arguments["items"])
+                client.beta.threads.runs.submit_tool_outputs(thread_id=thread_id,
+                                                            run_id=run.id,
+                                                            tool_outputs=[{
+                                                                "tool_call_id":
+                                                                tool_call.id,
+                                                                "output":
+                                                                json.dumps(output)
+                                                            }])
+                
+                if tool_call.function.name == "start_payment":
+                # Payment Started
+                arguments = json.loads(tool_call.function.arguments)
+                output = functions.start_payment(arguments["method"])
+                client.beta.threads.runs.submit_tool_outputs(thread_id=thread_id,
+                                                            run_id=run.id,
+                                                            tool_outputs=[{
+                                                                "tool_call_id":
+                                                                tool_call.id,
+                                                                "output":
+                                                                json.dumps(output)
+                                                            }])
+                """                                             
+    # Retrieve and return the latest message from the assistant
+    messages = client.beta.threads.messages.list(thread_id=thread_id)
+    response = messages.data[0].content[0].text.value     
+
+    print(f"Assistant response: {response}")  # Debugging line
+    return jsonify({"response": response})
 
 """
 # Test function 1
