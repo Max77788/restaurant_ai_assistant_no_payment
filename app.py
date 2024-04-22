@@ -200,10 +200,13 @@ def chat():
                                                                 }])
                     
                     print(f"\nOutput Submitted!\n")
-                    should_break = True
-                    break  # This breaks the for loop, not the while loop
-            if should_break:
-                break  # This will break the while loop if the flag is set
+                    
+                    response = "Order Taken, yuhuuuuu!"
+                    return jsonify({"response": response})
+                    #should_break = True
+                    #break  # This breaks the for loop, not the while loop
+            #if should_break:
+                #break  # This will break the while loop if the flag is set
                 
                 """
                 if tool_call.function.name == "post_order":
