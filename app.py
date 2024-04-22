@@ -1,7 +1,7 @@
 import os
 from time import sleep
 #from packaging import version (omit version check for now)
-from flask import Flask, request, jsonify, render_template, abort
+from flask import Flask, request, jsonify, render_template, abort, Response
 import openai
 from openai import OpenAI
 import functions
@@ -182,13 +182,26 @@ def chat():
           print("\n\n\n\nRetrieved arguments:\n", arguments, "\n\n\n\n") #debugging line
 
           output = functions.post_order(arguments["items"])
+          
+          # Convert the output to a serializable format if not already
+          if isinstance(output, Response):
+           # Convert your Response object into a serializable dictionary
+                # This is just an example; you'll need to adapt it based on the actual structure of `output`
+            output_dict = {
+                        'status_code': output.status_code,
+                        'data': output.json()  # Assuming the response is in JSON format
+            }
+          else:
+                # If it's already a dictionary or a serializable object, use as is
+            output_dict = output
+          
           client.beta.threads.runs.submit_tool_outputs(thread_id=thread_id,
                                                        run_id=run.id,
                                                        tool_outputs=[{
                                                            "tool_call_id":
                                                            tool_call.id,
                                                            "output":
-                                                           json.dumps(output)
+                                                           json.dumps(output_dict)
                                                        }])
         """
         if tool_call.function.name == "post_order":
