@@ -173,27 +173,27 @@ def chat():
         sleep(1)  # Wait for a second before checking again
         if run_status.status == "requires_action":
             print("Action in progress...")
-        # Handle the function call
-        for tool_call in run_status.required_action.submit_tool_outputs.tool_calls:
-            if tool_call.function.name == "post_order":
-            # Pizza order accepted
-                arguments = json.loads(tool_call.function.arguments)
+            # Handle the function call
+            for tool_call in run_status.required_action.submit_tool_outputs.tool_calls:
+                if tool_call.function.name == "post_order":
+                # Pizza order accepted
+                    arguments = json.loads(tool_call.function.arguments)
 
-                print("\n\n\n\nRetrieved arguments:\n", arguments, "\n\n\n\n") #debugging line
+                    print("\n\n\n\nRetrieved arguments:\n", arguments, "\n\n\n\n") #debugging line
 
-                if arguments:
-                    output = functions.post_order(arguments["items"])
-                else:
-                    items = [{"name":"Order\'s items were not retrieved", "quantity":"Ask the customer directly, or take a look at the tablet\'s screen"}]
-                    output = functions.post_order(items)
-                print(f"Output Status Code: {output.status_code}")
-                print(f"Output Headers: {output.headers}")
-                if output.text:
-                    print(f"Output Body: {output.text}")  # Use .text if the response body is text, .json() if it's JSON
-                elif output.json():
-                    print(f"Output Body: {output.json()}")
-                
-                break
+                    if arguments:
+                        output = functions.post_order(arguments["items"])
+                    else:
+                        items = [{"name":"Order\'s items were not retrieved", "quantity":"Ask the customer directly, or take a look at the tablet\'s screen"}]
+                        output = functions.post_order(items)
+                    print(f"Output Status Code: {output.status_code}")
+                    print(f"Output Headers: {output.headers}")
+                    if output.text:
+                        print(f"Output Body: {output.text}")  # Use .text if the response body is text, .json() if it's JSON
+                    elif output.json():
+                        print(f"Output Body: {output.json()}")
+                    
+                    break
                 
                 '''
                 # Convert the output to a serializable format if not already
