@@ -38,7 +38,7 @@ def start_payment(items):
 
 def post_order(items):  
     # URL of your backend server endpoint that handles the POST request
-    server_url = 'https://biryani-order-dashboard-sqng.vercel.app/orders'
+    server_url = 'https://newbiryaniorderdashboard.onrender.com/orders'
     
     # Preparing the data to be sent in the POST request
     data_to_send = {
