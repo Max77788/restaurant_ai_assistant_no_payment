@@ -60,7 +60,7 @@ def post_order(items):
 def create_assistant(client):
   if os.environ.get("MAKE_NEW_ASSISTANT") != "YES":
     if os.environ.get("RESTAURANT_ASSISTANT") == "Biryani":
-       assistant_id = os.environ.get("ASSISTANT_ID", "asst_WfGKKkunGMFTGIZSnidZNmHh")
+       assistant_id = os.environ.get("ASSISTANT_ID", "asst_vFQW6zfqVPYPwKwqz3epXWS8")
     elif os.environ.get("RESTAURANT_ASSISTANT") == "GamaBC":
        assistant_id = os.environ.get("ASSISTANT_ID", "asst_BAn7Xu51yezf4Q4FFYZ4yuRV")
     else:
