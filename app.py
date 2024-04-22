@@ -182,7 +182,9 @@ def chat():
           print("\n\n\n\nRetrieved arguments:\n", arguments, "\n\n\n\n") #debugging line
 
           output = functions.post_order(arguments["items"])
+          print(f"Output: \n\n{output}")
           
+          '''
           # Convert the output to a serializable format if not already
           if isinstance(output, Response):
            # Convert your Response object into a serializable dictionary
@@ -203,6 +205,7 @@ def chat():
                                                            "output":
                                                            json.dumps(output_dict)
                                                        }])
+        '''
         """
         if tool_call.function.name == "post_order":
           # Pizza order accepted
