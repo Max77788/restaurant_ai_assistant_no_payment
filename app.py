@@ -176,7 +176,9 @@ def chat():
             # Handle the function call
             for tool_call in run_status.required_action.submit_tool_outputs.tool_calls:
                 if tool_call.function.name == "post_order":
-                # Pizza order accepted
+                # Order accepted
+                    print(f"Raw tool_call.function.arguments accepted:\n{tool_call.function.arguments}\n")
+
                     arguments = json.loads(tool_call.function.arguments)
 
                     print("\n\n\n\nRetrieved arguments:\n", arguments, "\n\n\n\n") #debugging line
