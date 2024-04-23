@@ -54,7 +54,7 @@ def post_order(items):
         return "success"
     else:
         print('Failed to post order. Status code:', response.status_code)
-        return "Was not able to post the order"
+        return "fail"
 
 
 def create_assistant(client):

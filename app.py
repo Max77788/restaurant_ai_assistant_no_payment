@@ -201,7 +201,10 @@ def chat():
                     
                     print(f"\nOutput Submitted!\n")
                     
-                    response = "Order Taken, yuhuuuuu!"
+                    if output == "success":
+                        response = "Order Taken, yuhuuuuu!"
+                    else:
+                        response = "Shoot, something wrong when posting"
                     return jsonify({"response": response})
                     #should_break = True
                     #break  # This breaks the for loop, not the while loop
