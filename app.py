@@ -181,9 +181,11 @@ def chat():
 
                     print("\n\n\n\nRetrieved arguments:\n", arguments, "\n\n\n\n") #debugging line
 
-                    if arguments:
+                    if "items" in arguments.keys():
+                        print("Welcome to the items in keys if loop")
                         output = functions.post_order(arguments["items"])
                     else:
+                        print("NOOT Welcome to the items in keys if loop")
                         items = [{"name":"Order\'s items were not retrieved", "quantity":"Ask the customer directly, or take a look at the tablet\'s screen"}]
                         output = functions.post_order(items)
                     # Convert the output to a serializable format if not already
