@@ -181,7 +181,7 @@ def chat():
 
                     arguments = json.loads(tool_call.function.arguments)
 
-                    print("\n\n\n\nRetrieved arguments:\n", arguments, "\n\n\n\n") #debugging line
+                    print(f"\n\n\n\nRetrieved arguments of type{type(arguments)}:\n{arguments}\n\n\n\n") #debugging line
 
                     if "items" in arguments.keys():
                         print("Welcome to the items in keys if loop")
