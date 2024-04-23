@@ -38,16 +38,21 @@ def start_payment(items):
 
 def post_order(items):  
     # URL of your backend server endpoint that handles the POST request
-    server_url = 'https://newbiryaniorderdashboard.onrender.com/orders'
+    
+    
+    server_url = os.environ.get("DASHBOARD_LINK", 'https://biryani-dashboard-103d35614f09.herokuapp.com/orders')
     
     # Preparing the data to be sent in the POST request
     data_to_send = {
         'items': items
     }
     
+    print("Starting POST request for order")
     # Sending the POST request to the server
     response = requests.post(server_url, json=data_to_send)
     
+    print("Response retrieved")
+
     # Checking if the request was successful
     if response.status_code == 200:
         print('Order posted successfully.')
